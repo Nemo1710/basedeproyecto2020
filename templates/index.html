@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block cuerpo %}
+<!-- Start Realtime sts area-->
+    <div class="realtime-statistic-area">
+        <div class="container">
+            <br>
+            <strong>Fuente:</strong> <a href="https://www.salud.gob.ec/actualizacion-de-casos-de-coronavirus-en-ecuador/">MSP del Ecuador</a>. <strong>Actualizado:</strong> {{datoscovid.Actualizado.date}}
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="text-center">
+                        <header><h4><strong>COVID-19 en ECUADOR</strong><img src='{%static "img/logo/icono-ecuador.jpg" %}' alt="yotec" width="50" height="50"/></h4>
+                        </header>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <div class="text-center">
+                        <header>Casos Totales</header>
+                        <h3><span class="counter">{{datoscovid.Casos_confirmados}}</span></h3>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <div class="text-center" style="color: red">
+                        <header>Fallecidos</header>
+                        <h3><span class="counter">{{datoscovid.Fallecidos}}</span></h3>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <div class="text-center" style="color: darkblue">
+                        <header>Recuperados</header>
+                        <h3><span class="counter">{{datoscovid.Recuperados}}</span></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="realtime-wrap notika-shadow mg-t-30" >
+                        <div class="realtime-ctn">
+                            <div class="realtime-title">
+                                <h2>Mapa Ecuador</h2>
+                            </div>
+                        </div>
+                        <div class="realtime-visitor-ctn">
+                            <div class="realtime-vst-sg">
+                                <p>Guayas</p>
+                                <h4><span class="counter">{% for i in datosprovincia %}{% if i.Provincia == "Guayas" %}{{i.Casos_positivos}}{% endif %}{% endfor %}</span></h4>
+                            </div>
+                            <div class="realtime-vst-sg">
+                                <p>Pichincha</p>
+                                <h4><span class="counter">{% for i in datosprovincia %}{% if i.Provincia == "Pichincha" %}{{i.Casos_positivos}}{% endif %}{% endfor %}</span></h4>
+                            </div>
+                        </div>
+                        <div class="realtime-map">
+                            <div class="vectorjsmarp" id="world-map"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="add-todo-list notika-shadow mg-t-30">
+                        <div class="realtime-ctn">
+                            <div class="realtime-title">
+                                <h2>Estado de los infectados</h2>
+                            </div>
+                        </div>
+                        <div class="bar-chart-wp">
+                            <canvas height="140vh" width="180vw" id="barchartpastel"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="add-todo-list notika-shadow mg-t-30">
+                        <div class="realtime-ctn">
+                            <div class="realtime-title">
+                                <h2>Gráfica por Provincias</h2>
+                            </div>
+                        </div>
+                        <div class="bar-chart-wp">
+                            <canvas height="140vh" width="180vw" id="barchartp"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- End Realtime sts area-->
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script>
+    /*----------------------------------------*/
+	/*  Chart por provincias
+	/*----------------------------------------*/
+    var ctx = document.getElementById('barchartp');
+    var barchartp = new Chart(ctx, {
+      type: 'bar',
+      data: {
+            labels: [{% for i in datosprovincia %}"{{ i.Provincia }}",{% endfor %}],
+            datasets: [{
+                label: 'Casos',
+                data: [{% for i in datosprovincia %}"{{ i.Casos_positivos }}",{% endfor %}],
+                backgroundColor: [{% for i in color1 %}"{{ i }}",{% endfor %}],
+                borderColor: [{% for i in color2 %}"{{ i }}",{% endfor %}],
+                borderWidth: 1
+            }]
+      },
+      options: {
+            responsive: true,
+			scales: {
+				yAxes: [{
+					ticks: {
+						beginAtZero:true
+					}
+				}]
+			}
+		}
+    });
+
+    /*----------------------------------------*/
+	/*  Chart Pastel
+	/*----------------------------------------*/
+    var ctpastel = document.getElementById('barchartpastel');
+    var barchartpastel = new Chart(ctpastel, {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: [
+						{{datoscovid.En_domicilio}},
+						{{datoscovid.Hospitalizados_leves}},
+						{{datoscovid.Hospitalizados_críticos}},
+						{{datoscovid.Fallecidos}},
+                        {{datoscovid.Recuperados}},
+
+					],
+					backgroundColor: [
+					    'rgb(0, 194, 146)',
+                        'rgb(255, 165, 0)',
+                        'rgb(255, 215, 0)',
+						'rgb(255, 0, 0)',
+						'rgb(0, 0, 255)',
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'En casa',
+					'Hospitalizado leve',
+					'Hospitalizado reservado',
+					'Fallecido',
+					'Recuperado'
+				]
+			},
+			options: {
+				responsive: true
+			}
+		});
+
+
+    /*----------------------------------------*/
+	/*  Mapa
+	/*----------------------------------------*/
+
+
+    var mapData = {
+                "EC.ES": 200,
+                "EC.PI": 100,
+                "EC.GU": 100,//{% for i in datosprovincia %}{% if i.Provincia == "Guayas" %}{% if i.Casos_positivos > 500%}200{% endif %}{% endif %}{% endfor %},
+
+     };
+
+
+</script>
+
+{% endblock cuerpo %}

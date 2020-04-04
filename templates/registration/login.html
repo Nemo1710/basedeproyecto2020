@@ -1,0 +1,51 @@
+{%  extends 'registration/base_login.html' %}
+{% load staticfiles %}
+
+{% block cuerpo %}
+<body>
+	<div class="limiter">
+		<div class="container-login100 page-background">
+			<div class="wrap-login100">
+				<form method="post" class="login100-form validate-form" action="{% url 'login' %}">
+                    {% csrf_token %}
+					<span class="login100-form-logo">
+						<img alt="" src='{% static "sysmet/img/logo.png" %}'>
+					</span>
+					<span class="login100-form-title p-b-34 p-t-27">
+						Sistemas Médicos Digitalizados
+					</span>
+                    {% if form.errors %}
+                    <p>Tu nombre de usuario y contraseña no coinciden, Intenta nuevamente.</p>
+                    {% endif %}
+
+                    {% if next %}
+                    {% if user.is_authenticated %}
+                    <p>Your account doesn't have access to this page. To proceed,
+                        please login with an account that has access.</p>
+                    {% else %}
+                    <p>Por favor iniciar sesión para ver esta página.</p>
+                    {% endif %}
+                    {% endif %}
+					<div class="wrap-input100 validate-input" data-validate="Enter username">
+						<input class="input100" type="text" id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" placeholder="Nombre de Usuario">
+						<span class="focus-input100" data-placeholder="&#xf207;"></span>
+					</div>
+					<div class="wrap-input100 validate-input" data-validate="Enter password">
+						<input class="input100" type="password" id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" placeholder="Contraseña">
+						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+					</div>
+					<div class="container-login100-form-btn">
+						<button  type="submit" class="login100-form-btn">
+							Iniciar Sesión
+						</button>
+					</div>
+					<div class="text-center p-t-30">
+						<a class="txt1" href="{% url 'password_reset' %}">
+							Olvidaste tu contraseña?
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
